@@ -94,7 +94,7 @@ total1[, -c(1, 2)] <- scale(total1[, -c(1, 2)],
                             center = TRUE, 
                             scale = TRUE)
 #Table for CRC only
-total2 <- total1[!(rownames(total1) %in% c("LSME0160", "LSME0152", "LSME0105", "LSME0095", "LSME0078", "LSME0045", "LSME0039", "LSME0004", "LSJ126")), ]
+total2 <- total1[!(rownames(total1) %in% c("Sample113", "Sample112", "Sample110", "Sample109", "Sample107", "Sample105", "Sample104", "Sample102", "Sample21")), ]
 
 #-------------------------------------------------------------------------------
 ##Step 4. Fit the cox model with 10 biomarkers for all LS related cancers
