@@ -32,7 +32,7 @@ targets_sel = targets[-c(77),-c(2:11, 13:34)] #for variant comparison
 targets_sel = targets[,-c(2:32)] #for future cancer
 
 #Delete PMS2 variant from mets
-#rowname_to_delete <- "LSME0131"
+#rowname_to_delete <- "Sample77"
 
 # Subset the dataframe to exclude the row with the specified rowname
 #mets2 <- mets1[rownames(mets1) != rowname_to_delete, ] #variant
@@ -64,13 +64,13 @@ mets <- sorted_df[,-c(1,2,3)]
 distance_matrix <- dist(mets, method = "euclidean")
 distance_matrix
 
-# fit the principal coordinates analysis using cmdscale
+# Fit the principal coordinates analysis using cmdscale
 my_pcoa <- stats:::cmdscale(distance_matrix)
 
 # print the result
 print(my_pcoa)
 
-# make file from Pcoa cordinates
+# Make file from Pcoa cordinates
 write.table(my_pcoa, file="pcoa_coordinates_mets", sep="\t", quote=F, col.names=NA)
 
 # Doing the mapping
@@ -95,7 +95,7 @@ filexxx <- tibble::rownames_to_column(filexx, "Filename")
 filex  <- merge(filexxx, targets_sel, by ="Filename", all=TRUE) # merge by row names
 filex$Cancer_during_surveillance <- as.character(filex$Cancer_during_surveillance)
 
-#rename cancer incidences from NO-YES to Healthy-Cancer
+#Rename cancer incidences from NO-YES to Healthy-Future Cancer
 filex <- filex %>%
   mutate(Cancer_during_surveillance = ifelse(Cancer_during_surveillance == "NO", "Healthy", "Future Cancer"))
 #Rename column name to status
@@ -130,14 +130,14 @@ variant_counts <- count(sorted_df, Variant)
 # Print the counts
 print(variant_counts)
 
-# set up groups, check order and numbers from step 2
+# Set up groups, check order and numbers from step 2
 groups <- factor(c(rep("MLH1", 82), rep("MSH2", 16), rep("MSH6", 17))) #tähäm montako missäkin ryhmässä on
 groups <- factor(c(rep("MLH1", 82), rep("MSH2", 16)))
 groups <- factor(c(rep("MLH1", 82), rep("MSH6", 17)))
 groups <- factor(c(rep("MSH2", 16), rep("MSH6", 17)))
 groups <- factor(c(rep("Healthy", 99), rep("Cancer", 17)))
                  
-# calculates the beta-dispersion for each group, when comparing 2 or more
+# Calculates the beta-dispersion for each group, when comparing 2 or more
 pathotype.disp <- betadisper(distance_matrix, groups)
 
 # plot showing the dispersion for each group
