@@ -1,0 +1,258 @@
+---
+title: "Canonical Correlation Analysis"
+output: html_notebook
+---
+
+Data: Next generation sequencing serum miRNA content and nightingale-metabolomics
+
+
+
+Setup working directory and install mixOmics package
+
+```{r}
+
+## install BiocManager if not installed if (!requireNamespace("BiocManager", quietly = TRUE))
+install.packages("BiocManager") 
+## install mixOmics 
+BiocManager::install('mixOmics')
+```
+
+Step 1 Load  and edit data
+```{r}
+
+# Import data 
+cmiR1 <- read.delim("normalized_miR_counts.txt")
+transposed_counts <- t(cmiR1) #samples need to be as rows
+cmiR <- as.data.frame(transposed_counts)
+mets <- read.table("boxcox_transf_data.txt")
+metadata <-read.delim("phenoData_filtered.txt")
+
+
+```
+
+PLS
+```{r}
+library(mixOmics) # import the mixOmics library
+
+X <- cmiR # use the cmiR expression data as the X matrix
+data.matrix(X, rownames.force = NA)
+Yy <- mets # use the metabolic data as the Y matrix
+data.matrix(Yy, rownames.force = NA)
+
+## Check NA values from matrix
+sum(is.na(X)) # number of cells with NA
+sum(is.na(Yy)) # number of cells with NA
+
+#if needed input missing values, NIPALS is used to decompose the dataset. 
+Y <- impute.nipals(X = Yy, ncomp = 10)
+sum(is.na(Y)) # number of cells with NA
+
+pls.result <- pls(X, Y) # run the method
+plotIndiv(pls.result)   # plot the samples
+plotVar(pls.result)     # plot the variables
+
+```
+
+Preliminary Analysis with PCA
+```{r}
+library(mixOmics)
+pca.mir <- pca(X, ncomp = 10, center = TRUE, scale = TRUE)
+pca.metabolomics <- pca(Y, ncomp = 10, center = TRUE, scale = TRUE)
+
+plot(pca.mir)
+plot(pca.metabolomics)
+```
+```{r}
+library(mixOmics)
+plotIndiv(pca.mir, comp = c(1, 2), 
+          group = ordered.phenodata$Cancer_during_surveillance, 
+          ind.names = ordered.phenodata$Cancer_during_surveillance, 
+          legend = TRUE, title = 'miR, PCA comp 1 - 2')
+
+plotIndiv(pca.metabolomics, comp = c(1, 2), 
+          group = ordered.phenodata$Cancer_during_surveillance, 
+          ind.names = ordered.phenodata$Cancer_during_surveillance, 
+          legend = TRUE, title = 'Metabolomics, PCA comp 1 - 2')
+```
+
+
+sPLS tuning
+```{r}
+library(mixOmics)
+#initial sPLS model
+spls.LS <- spls(X = X, Y = Y, ncomp = 5, mode = 'regression')
+
+#Tuning sPLS
+# repeated CV tuning of component count
+perf.spls.LS <- perf(spls.LS, validation = 'Mfold',
+                         folds = 10, nrepeat = 5) 
+
+plot(perf.spls.LS, criterion = 'Q2.total')
+
+# set range of test values for number of variables to use from X dataframe
+list.keepX <- c(seq(10, 50, 5))
+# set range of test values for number of variables to use from Y dataframe
+list.keepY <- c(3:10) 
+
+
+tune.spls.LS <- tune.spls(X, Y, ncomp = 2,
+                              test.keepX = list.keepX,
+                              test.keepY = list.keepY,
+                              nrepeat = 1, folds = 10, # use 10 folds
+                              mode = 'regression', measure = 'cor') 
+plot(tune.spls.LS)         # use the correlation measure for tuning
+
+tune.spls.LS$choice.keepX
+
+tune.spls.LS$choice.keepY
+
+# extract optimal number of variables for X dataframe
+optimal.keepX <- tune.spls.LS$choice.keepX 
+
+# extract optimal number of variables for Y datafram
+optimal.keepY <- tune.spls.LS$choice.keepY
+
+optimal.ncomp <-  length(optimal.keepX) # extract optimal number of components
+
+```
+Final model, Using the tuned parameters generated above, the final sPLS model can be constructed.
+```{r}
+# use all tuned values from above
+final.spls.LS <- spls(X, Y, ncomp = optimal.ncomp, 
+                    keepX = optimal.keepX,
+                    keepY = optimal.keepY,
+                    mode = "regression") # explanitory approach being used, 
+                                         # hence use regression mode
+
+```
+
+Plots1, Sample plot for sPLS2 performed on the LS data. Samples are projected into the space spanned by the components associated to each data set (or block).
+```{r}
+plotIndiv(final.spls.LS, ind.names = FALSE, 
+         rep.space = "X-variate", # plot in X-variate subspace
+         group = ordered.phenodata$Sex, # colour bytype
+         pch = as.factor(ordered.phenodata$Cancer_during_surveillance),  #  By status
+         col.per.group = color.mixo(1:2), 
+         legend = TRUE, legend.title = 'Sex', legend.title.pch = 'Type')
+
+plotIndiv(final.spls.LS, ind.names = FALSE,
+         rep.space = "Y-variate", # plot in Y-variate subspace
+         group = ordered.phenodata$Sex, # colour by sex
+         pch = as.factor(ordered.phenodata$Cancer_during_surveillance), 
+         col.per.group = color.mixo(1:2), 
+         legend = TRUE, legend.title = 'Type', legend.title.pch = 'Health')
+```
+
+
+
+Plots 2.Sample plot for sPLS2 performed on the LS data. Samples are projected into the space spanned by the averaged components of both datasets (cmiR and metabolomics).
+```{r}
+plotIndiv(final.spls.LS, ind.names = FALSE, 
+         rep.space = "XY-variate", # plot in averaged subspace
+         group = ordered.phenodata$Sex, # colour by Type
+         pch = as.factor(ordered.phenodata$Cancer_during_surveillance), # symbol per health status
+         col.per.group = color.mixo(1:2),                      # by dose group
+         legend = TRUE, legend.title = 'Sex', legend.title.pch = 'Status')
+
+```
+
+
+Plot 3, The start of the arrow indicates the location of a given sample in the space spanned by the components associated to the miR data set, and the tip of the arrow the location of that same sample in the space spanned by the components associated to the metabolism data set
+```{r}
+plotArrow(final.spls.LS, ind.names = FALSE,
+          group = ordered.phenodata$Cancer_during_surveillance, # colour by status
+          col.per.group = color.mixo(1:8),
+          legend.title = 'Sex')
+```
+
+
+Variable plots 1, The stability of a given feature is defined as the proportion of cross validation folds (across repeats) where it was selected for to be used for a given component.
+```{r}
+# form new perf() object which utilises the final model
+perf.spls.LS <- perf(final.spls.LS, 
+                          folds = 5, nrepeat = 10, # use repeated cross-validation
+                          validation = "Mfold", 
+                          dist = "max.dist",  # use max.dist measure
+                          progressBar = FALSE)
+
+# plot the stability of each feature for the first two components, 
+# 'h' type refers to histogram
+par(mfrow=c(1,2)) 
+plot(perf.spls.LS$features$stability.X[[1]], type = 'h',
+     ylab = 'Stability',
+     xlab = 'Features',
+     main = '(a) Comp 1', las =2,
+     xlim = c(0, 150))
+plot(perf.spls.LS$features$stability.X$comp2, type = 'h',
+     ylab = 'Stability',
+     xlab = 'Features',
+     main = '(b) Comp 2', las =2,
+     xlim = c(0, 300))
+```
+
+Variable plots 2, The relationship between the features and components can be explored using a correlation circle plot. This highlights the contributing variables that together explain the covariance between the two datasets. Specific subsets of molecules can be further investigated. This plot shows the correlations between selected miRs , between selected metabolic parameters and the relationship between sets of miRs and certain metabolic parameters.
+```{r}
+plotVar(final.spls.LS, cex = c(3,4),cutoff = 0.45, var.names = c(TRUE, TRUE))
+```
+
+variable plots 3, The networks are bipartite, where each edge links a mir (rectangle) to a metabolomic variable (circle) node, according to a similarity matrix.Saves image
+```{r}
+ # Load necessary package
+library(mixOmics)
+
+# Set the colors for the connecting lines
+color.edge <- color.GreenRed(50)
+
+# Open a new window with specified size (width and height in inches)
+X11(width = 10, height = 8)
+
+# Define the path and name of the saved PNG file
+png(filename = "sPLS_Lynch_Study_Network_Plot_LS_H.png", width = 2000, height = 1600, res = 200)
+
+# Generate the network plot
+network(final.spls.LS, comp = 1:2,
+        cutoff = 0.30, # only show connections with a correlation above 0.30
+        shape.node = c("rectangle", "circle"),
+        color.node = c("orange", "lightblue"),
+        color.edge = color.edge)
+
+# Close the PNG device
+dev.off()
+
+# Close the X11 device
+dev.off()
+
+#color.edge <- color.GreenRed(50)  # set the colours of the connecting lines
+
+#X11() # To open a new window for Rstudio
+#network(final.spls.LS, comp = 1:2,
+ #       cutoff = 0.30, # only show connections with a correlation above 0.30
+  #      shape.node = c("rectangle", "circle"),
+   #     color.node = c("orange", "lightblue"),
+    #    color.edge = color.edge,
+     #   save = 'png', # save as a png to the current working directory
+      #  name.save = 'sPLS Lynch Study Network Plot_LS_H')
+```
+Variable plots 4, The heatmap plot displays the similarity values between the cmir and metabolomics variables selected across two dimensions, and clustered with a complete Euclidean distance method. Saves image
+```{r}
+# Load necessary package
+library(mixOmics)
+
+# Open a new window with larger size (width and height in inches)
+X11(width = 20, height = 15)
+
+# Define the path and name of the saved JPEG file with larger dimensions
+jpeg(filename = "PLS_CIM_image_LS_H_0.4.jpeg", width = 4000, height = 3000, res = 300)
+
+# Set graphical parameters for text size
+par(cex.main = 1, cex.lab = 1, cex.axis = 1, mar = c(15, 15, 15, 15))
+
+# Generate the heatmap plot with adjusted text sizes
+cim.res <- cim(final.spls.LS, comp = 1:2, cutoff = 0.3,
+               xlab = "Metabolism", ylab = "cmiRs",
+               save = "jpeg", name.save = "PLS_CIM_image_LS_H_0.4")
+
+
+```
+
+
