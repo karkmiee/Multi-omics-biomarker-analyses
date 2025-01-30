@@ -35,7 +35,7 @@ targets_sel = targets[,-c(2:32)] #for future cancer
 
 # Transpose the data frame
 transposed_data <- t(cmiR_data)
-#rowname_to_delete <- "LSME0131" #exclude PMS2 carrier when comparing variant groups
+#rowname_to_delete <- "Sample77" #exclude PMS2 carrier when comparing variant groups
 #transposed_data <- transposed_data[rownames(transposed_data) != rowname_to_delete, ] # Subset the dataframe to exclude the row with the specified rowname
 
 #Merge and reorder df (Note you have do this separately for the variant and cancer status comparison)
