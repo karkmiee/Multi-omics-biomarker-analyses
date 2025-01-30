@@ -31,8 +31,10 @@ This repository contains R scripts used in the analyses described above. Below i
 - **`PcoA_cmiR.R`**: Scripts for performing Principal Coordinate Analysis.  
 - **`PcoA_metabolomics.R`**: Scripts for performing Principal Coordinate Analysis.  
 - **`WGCNA_cmiR.R`**: Scripts for Weighted Correlation Network Analysis (microRNAs).  
-- **`WGCNA_metabolomics.R`**: Scripts for Weighted Correlation Network Analysis (metabolomics).  
+- **`WGCNA_metabolomics.R`**: Scripts for Weighted Correlation Network Analysis (metabolomics).
+- **`MixOmics_miR_metab.Rmd`**:   Scripts for Canonical Correlation Analysis.
+-  **`multiomics_split 1.py`**: Scripts for randomized datasplit.
 - **`Lasso_Cox_regression.R`**: Scripts for Lasso Cox regression and model validation.  
 
 
-For questions or collaboration inquiries, please contact Minta Kärkkäinen (minta.e.m.karkkainen@jyu.fi) or corresponding author, Research director, PhD. Tiina Jokela (tiina.a.jokela@jyu.fi).
+For questions or collaboration inquiries, please contact Minta Kärkkäinen (minta.e.m.karkkainen@jyu.fi) or corresponding author, Research director, PhD. Tiina Jokela (tiina.a.jokela@jyu.fi). Note: Due to ethical standards, not all phenotypic data required for analyses can be publicly shared. 
