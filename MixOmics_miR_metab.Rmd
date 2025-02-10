@@ -1,5 +1,5 @@
 ---
-title: "Canonical Correlation Analysis"
+title: "Partial Least Squares (PLS) regression and sparse PLS (sPLS)"
 output: html_notebook
 ---
 
