@@ -10,7 +10,7 @@ The study cohort included 116 Lynch Syndrome carriers who were healthy at the ti
 1. **Principal Coordinate Analysis (PCoA)**:  
 To explore omics-level differences between pathogenic mismatch repair gene variant carriers  and healthy and future cancer groups. 
 
-2. **Partial Least Squares (PLS) regression and sparse PLS (sPLS)**:  
+2. **Sparse Partial Least Squares (sPLS) regression**:  
 To uncover associations between circulating microRNAs and metabolites.
 
 3. **Weighted Correlation Network Analysis (WGCNA)**:  
@@ -32,7 +32,7 @@ This repository contains R scripts used in the analyses described above. Below i
 - **`PcoA_metabolomics.R`**: Scripts for performing Principal Coordinate Analysis.  
 - **`WGCNA_cmiR.R`**: Scripts for Weighted Correlation Network Analysis (microRNAs).  
 - **`WGCNA_metabolomics.R`**: Scripts for Weighted Correlation Network Analysis (metabolomics).
-- **`MixOmics_miR_metab.Rmd`**:   Scripts for Partial Least Squares (PLS) regression and sparse PLS (sPLS).
+- **`MixOmics_miR_metab.Rmd`**:   Scripts for Sparse Partial Least Squares (sPLS) regression.
 - **`multiomics_split 1.py`**: Scripts for randomized datasplit.
 - **`Lasso_Cox_regression.R`**: Scripts for Lasso Cox regression and model validation.  
 
