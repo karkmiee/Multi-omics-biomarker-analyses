@@ -4,11 +4,12 @@
 #Note: Metabolomics data is not expression data, however, this analyzing method has been used in the research field to study metabolites that correlate with one and other.
 #https://bioinformaticsworkbook.org/tutorials/wgcna.html#gsc.tab=0
 
+##Here we studied how c-Metab co-level modules associate with path_MMR variant or upcoming cancer of LS carriers
 #Data: NMR analyzed serum metabolite content
 
 #Abbreviations used in data and scripts:
 #LS = lynch syndrome group, MMR gene mutation carriers
-#cMet = circulating metabolites
+#c-Metab = circulating metabolites
 
 
 #-------------------------------------------------------------------------------
@@ -19,10 +20,8 @@ library(tidyverse)
 library(magrittr)      # provides the %>% operator
 library(WGCNA)
 library(GO.db)
-library(impute)
-library(preprocessCore)
 
-#Load data normalized cMet countdata and phenodata
+#Load data normalized c-Metab data and phenodata
 mets <- read.table("boxcox_transf_data.txt")
 metadata <-read.table("phenoData_filtered.txt", header= TRUE,sep="\t")
 
@@ -32,8 +31,8 @@ metadata <-read.table("phenoData_filtered.txt", header= TRUE,sep="\t")
 #when you pick up soft threshold it should only contain metabolite levels
 
 
-#We can see now that the rows = samples and columns = cMet probes. We’re ready to start WGCNA. 
-#A correlation network will be a complete network (all cMets are connected to all other cMets). 
+#We can see now that the rows = samples and columns = c-Metab probes. We’re ready to start WGCNA. 
+#A correlation network will be a complete network (all c-Metab are connected to all other c-Metab). 
 #Ergo we will need to pick a threshhold value (if correlation is below threshold, remove the edge). We assume the true biological network follows a scale-free structure (see papers by Albert Barabasi).
 
 #To do that, WGCNA will try a range of soft thresholds and create a diagnostic plot: 
@@ -151,7 +150,7 @@ plotDendroAndColors(
 ##------------------------------------------------------------------------------
 ##Step 4. Module-trait associations.
 
-#We have written out a tab delimited file listing the cMets and their modules. 
+#We have written out a tab delimited file listing the c-Metab and their modules. 
 #However, we need to figure out which modules are associated with each trait of interest. 
 #WGCNA will calcuate an Eigangene (hypothetical central gene) for each module, so it easier to determine if modules are associated with different traits.
 
@@ -234,12 +233,6 @@ combined_data$BMI <- gsub(",", ".", combined_data$BMI)
 combined_data$BMI <- as.numeric(combined_data$BMI)
 combined_data <- combined_data[combined_data$Variant != "PMS2", ]
 
-#if needed impute missing values, NIPALS is used to decompose the dataset.
-library(mixOmics)
-sum(is.na(combined_data)) # number of cells with NA 
-combined_data <- impute.nipals(X = combined_data, ncomp = 10)
-sum(is.na(combined_data)) # number of cells with NA
-
 ## Define the LMM equation: 
 
 #MEturquoise
@@ -253,7 +246,7 @@ reduced.lmer <- lmer(MEturquoise ~ 1 + (1 | Age) + (1 | BMI),
 anova(reduced.lmer, full.lmer)
 
 
-install.packages('stargazer')
+#install.packages('stargazer')
 library(stargazer)
 
 model_turquoise_star <- stargazer(model_turquoise, type = "text",
