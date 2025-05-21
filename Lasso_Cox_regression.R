@@ -1,9 +1,9 @@
 ### Title: Lasso Cox proportional hazards model ----
 
-#This script is used to identify cancer-predicting biomarkers of Lynch Syndrome and evaluate their cancer-predicting capacity. 
+#This script is used to identify potential cancer-predicting biomarkers of Lynch Syndrome and evaluate their cancer-predicting capacity. 
 
 #Data: The data includes next generation sequencing serum microRNA & metabolite content
-#and information about whether the study subject developed cancer during the 5.8-year surveillance period. 
+#and information about whether the study subject developed cancer during a 5.8-year surveillance period. 
 
 #-------------------------------------------------------------------------------
 ##Step 1. Load libraries and import data
@@ -35,7 +35,7 @@ totalx <- totalx %>%
 #-------------------------------------------------------------------------------
 ##Step 2. Feature selection using Lasso cox
 
-#cmiRs
+#c-miRNAs
 
 # Extract predictors
 x0 <- data.matrix(totalx[ ,c(7:21)]) %>%  
@@ -63,7 +63,7 @@ features0<-rownames(lambda0)[nonZeroIdx0]
 features0
 
 
-#cMets
+#c-Metab
 
 # Extract predictors
 x1 <- data.matrix(totalx[ ,c(22:85)]) %>%  
@@ -87,7 +87,7 @@ features1
 
 
 #-------------------------------------------------------------------------------
-##Step 3. Scale mirs and metabolites to same distributions and extract df for CRC only
+##Step 3. Scale cmiRNAs and metabolites to same distributions and extract df for CRC only
 
 total1 <- totalx[,-c(1:4)] #remove phenodata from the df
 total1[, -c(1, 2)] <- scale(total1[, -c(1, 2)], 
