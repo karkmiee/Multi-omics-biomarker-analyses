@@ -3,14 +3,14 @@
 
 
 #Data: Next generation sequencing serum microRNA content.
-# This script is used to make a filtered and normalized c-miR count file for downstream analyses.
+# This script is used to make a filtered and normalized c-miRNA count file for downstream analyses.
 
 #Abbreviations used in script:
-#microRNA = miR
+#microRNA = miRNA
 
 #------------------------------------------------------------------------------------------
 
-#Step 1. Install packages and import raw cmiR data and phenodata
+#Step 1. Install packages and import raw cmiRNA count data and phenodata
 
 # Load packages
 library(dplyr)
@@ -27,7 +27,7 @@ targets<- read.table("phenoData_filtered.txt", header = TRUE, sep = "\t")
 
 ##---------------------------------------------------------------------------
 
-#Step 2. Use DEseq2 to normalize miR read counts and SVA to account the batch effect. 
+#Step 2. Use DEseq2 to normalize miRNA read counts and SVA to account the batch effect. 
 
 
 #Filter out miRs where counts is less than 1 in 50% of the samples
