@@ -1,10 +1,14 @@
-#title: "PCoA clustering and PERMANOVA distance analysis of metabolomics"
+#title: "PCoA, PERMANOVA and ANOSIM analysis of metabolomics data"
+
+#This script was used to analyze metabolomic differences between Lynch syndrome gene variant carriers, 
+#as well as between individuals who remained healthy during surveillance period and those who developed cancer
 
 #Data: NMR serum metabolomics content 
 
 #Abbreviations used in data and scripts:
 #LS = lynch syndrome group, MMR genes mutation carriers
 #MMR genes: MLH1, MSH2, MSH6 and PMS2
+#c-Metab = circulating metabolites
 
 
 ###-----------------------------------------------------------------------------
@@ -13,14 +17,12 @@
 
 library(readxl)
 library(dplyr)
-library(ape)
 library(vegan)
-library(hagis)
 library(ggplot2)
 library(stats)
 
 
-# Import mets data
+# Import c-Metab data
 mets1 <- read.delim("boxcox_transf_data.txt")
 
 # Import phenodata
@@ -29,7 +31,7 @@ targets<- read.delim("phenoData_filtered.txt")
 
 # Select phenodata which you wan to use in grouping, take out all else
 targets_sel = targets[-c(77),-c(2:11, 13:34)] #for variant comparison
-targets_sel = targets[,-c(2:32)] #for future cancer
+targets_sel = targets[,-c(2:32)] #for status comparison
 
 #Delete PMS2 variant from mets
 #rowname_to_delete <- "Sample77"
@@ -40,7 +42,7 @@ mets2<-mets1 #future cancer
 
 ##------------------------------------------------------------------------------
 
-#Step 2.Principal coordinate analysis PCoA to mets data
+#Step 2.Principal coordinate analysis PCoA to Metab data
 
 #Merge and reorder df
 mets3 <- cbind(Filename = rownames(mets2), mets2)
@@ -95,7 +97,7 @@ filexxx <- tibble::rownames_to_column(filexx, "Filename")
 filex  <- merge(filexxx, targets_sel, by ="Filename", all=TRUE) # merge by row names
 filex$Cancer_during_surveillance <- as.character(filex$Cancer_during_surveillance)
 
-#Rename cancer incidences from NO-YES to Healthy-Future Cancer
+#Rename cancer incidences from NO-YES to Healthy-Future cancer
 filex <- filex %>%
   mutate(Cancer_during_surveillance = ifelse(Cancer_during_surveillance == "NO", "Healthy", "Future Cancer"))
 #Rename column name to status
@@ -118,7 +120,7 @@ p <- ggplot(data = filex, aes(x = V1, y = V2, colour =Status)) +
   scale_fill_gradient(low = "blue", high = "red") +
   guides(colour = "none")  # Hides the colour legend
 p + facet_wrap(~Status)+
-  ggtitle("Euclidean Distances PCoA cMets by Status")
+  ggtitle("c-Metab PCoA Euclidean distances by status")
 
 ##------------------------------------------------------------------------------
 
@@ -130,8 +132,8 @@ variant_counts <- count(sorted_df, Variant)
 # Print the counts
 print(variant_counts)
 
-# Set up groups, check order and numbers from step 2
-groups <- factor(c(rep("MLH1", 82), rep("MSH2", 16), rep("MSH6", 17))) #tähäm montako missäkin ryhmässä on
+# Set up groups, check order and numbers from step 2 or with table function
+groups <- factor(c(rep("MLH1", 82), rep("MSH2", 16), rep("MSH6", 17))) 
 groups <- factor(c(rep("MLH1", 82), rep("MSH2", 16)))
 groups <- factor(c(rep("MLH1", 82), rep("MSH6", 17)))
 groups <- factor(c(rep("MSH2", 16), rep("MSH6", 17)))
