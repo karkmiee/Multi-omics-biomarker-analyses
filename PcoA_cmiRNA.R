@@ -5,7 +5,7 @@
 #Abbreviations used in data and scripts:
 #LS = lynch syndrome group, MMR genes mutation carriers
 #MMR genes: MLH1, MSH2, MSH6 and PMS2
-#c-miRNA = circulating microRNA
+#c-miRNA = circulating microRNA 
 
 
 ###----------------------------------------------------------------------------
