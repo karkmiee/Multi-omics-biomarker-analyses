@@ -2,23 +2,23 @@
 
 #The WGCNA R package builds “weighted gene correlation networks for analysis” from expression data
 #https://bioinformaticsworkbook.org/tutorials/wgcna.html#gsc.tab=0
+#Here we studied how c-miRNA co-expression modules associate with path_MMR variant or upcoming cancer of LS carriers
 
 #Data: Next generation sequencing serum miRNA content
 
 #Abbreviations used in data and scripts:
 #LS = lynch syndrome group, MMR gene mutation carriers
-##Circulating microRNA = cmiR
+##Circulating microRNA = c-miRNA
 
 
 #-------------------------------------------------------------------------------
-##Step 1: Install packages and import dataframes: LS phenodata and normalized cmiRs.
+##Step 1: Install packages and import dataframes: LS phenodata and normalized c-miRNAs.
 
 library(tidyverse) 
 library(magrittr)      # provides the %>% operator
 library(WGCNA)
 library(GO.db)
-library(impute)
-library(preprocessCore)
+#library(preprocessCore)
 
 #Load data normalized cmiR countdata and phenodata
 cmiR1 <- read.table("normalized_miR_counts.txt")
@@ -33,7 +33,7 @@ cmiR <- as.data.frame(t(cmiR1))  #use in module detection
 #When you pick up soft threshold it should only contain expression values
 
 
-#We can see now that the rows = samples and columns = miR probes. We’re ready to start WGCNA. 
+#We can see now that the rows = samples and columns = miRNA probes. We’re ready to start WGCNA. 
 #A correlation network will be a complete network (all genes are connected to all other genes). 
 #Ergo we will need to pick a threshhold value (if correlation is below threshold, remove the edge). 
 #We assume the true biological network follows a scale-free structure (see papers by Albert Barabasi).
@@ -98,12 +98,12 @@ text(sft$fitIndices[, 1],
 
 #The choice of the soft-thresholding power (β) in WGCNA is crucial as it determines the scale of the co-expression network. 
 #Selecting too high or too low a soft-thresholding power can have significant effects on the resulting network and subsequent analyses.
-#based on plots the appropriate soft thresholds are: 5, 6 or 7. Here we select a soft-thresholding power 6. 
+#Based on plots the appropriate soft thresholds are: 5, 6 or 7. Here we select a soft-thresholding power 6. 
 #-------------------------------------------------------------------------------
 ##Step 3. WGCNA
 
 #Note here we select to use Spearman correlation instead of Pearson correlation. 
-#This is due to some variability in cmiR expression data, where even after normalization, all cmiRs did not follow normal distribution.
+#This is due to some variability in c-miRNA expression data, where even after normalization, all c-miRNAs did not follow normal distribution.
 #Second note: We tested also Pearson correlation and results were quite similar. 
 
 picked_power = 6     
@@ -153,9 +153,9 @@ plotDendroAndColors(
 ##------------------------------------------------------------------------------
 ##Step 4. Module-trait associations.
 
-#We have written out a tab delimited file listing the cmiRs and their modules. 
+#We have written out a tab delimited file listing the c-miRNAs and their modules. 
 #However, we need to figure out which modules are associated with each variant group or status. 
-#WGCNA will calcuate an Eigangene (hypothetical central gene) for each module, so it easier to determine if modules are associated with different path_MMR genes or Future cancer/Healthy groups.
+#WGCNA will calcuate an Eigangene (hypothetical central gene) for each module, so it easier to determine if modules are associated with different path_MMR gene variant carriers or Future cancer/Healthy groups.
 
 # Load required libraries
 library(dplyr)
