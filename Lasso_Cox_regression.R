@@ -111,6 +111,15 @@ ggforest(full.cox, data = total1) #plot the results
 test.ph <- cox.zph(full.cox) 
 test.ph 
 
+#Additional step: test whether previous cancer hostory impacts to outcome (for this you have to include previous_ca status)
+full.cox_test <- coxph(Surv(time,status) ~ hsa.miR.101.3p + hsa.miR.182.5p + hsa.miR.183.5p + hsa.miR.4732.3p + hsa.miR.148b.3p + HDL_TG + Tyr + Glucose + Acetate + GlycA + Previous_ca, data = total1, x=TRUE)
+summary(full.cox_test)
+anova(full.cox_test) #based on this leave only most promising
+
+#Check also if previous_ca impacts future_ca using chi-square test:
+table_data <- table(total1$Previous_ca, total1$status) # Assuming a and b are vectors of 0/1
+chisq.test(table_data)
+
 #Repeat same for the reduced model 
 full.cox.1 <- coxph(Surv(time,status) ~ hsa.miR.101.3p + hsa.miR.183.5p + HDL_TG, data = total1, x=TRUE)
 summary(full.cox.1)
