@@ -186,7 +186,7 @@ plot(perf.spls.LS$features$stability.X$comp2, type = 'h',
 
 
 #Variable plots 2. The relationship between the features and components can be explored using a correlation circle plot. This highlights the contributing variables that together explain the covariance between the two datasets. Specific subsets of molecules can be further investigated. This plot shows the correlations between selected miRNAs , between selected metabolic parameters and the relationship between sets of miRNAs and certain metabolic parameters.
-pdf("final.spls.LS.pdf", width = 6, height = 4)  #Save the correlation cirrcle plot as pdf
+pdf("final.spls.LS.pdf", width = 6, height = 4)  #Save the correlation circle plot as pdf
 plotVar(final.spls.LS, cex = c(3,4),cutoff = 0.45, var.names = c(TRUE, TRUE))
 dev.off() #close pdf 
 
