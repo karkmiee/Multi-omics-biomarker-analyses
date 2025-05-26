@@ -1,7 +1,7 @@
-# Multi-omics Approaches to Uncover Liquid-Based Cancer-Predicting Biomarkers in Lynch Syndrome
+# Integrative Bi-omics Approaches to Uncover Liquid-Based Cancer-Predicting Biomarkers in Lynch Syndrome
 
 ## Background  
-Lynch Syndrome is a genetic cancer-predisposing syndrome caused by pathogenic mutations in DNA mismatch repair (path_MMR) genes. Due to the elevated cancer risk, novel screening methods are crucial to enhance cancer risk stratification. This project demonstrates how multi-omics integration can pinpoint cancer-predicting biomarkers in Lynch Syndrome. Specifically, we investigated blood-based circulating microRNAs and metabolites that predict cancer occurrence within a 5.8-year prospective surveillance period.
+Lynch Syndrome is a genetic cancer-predisposing syndrome caused by pathogenic mutations in DNA mismatch repair (path_MMR) genes. Due to the elevated cancer risk, novel screening methods are crucial to enhance cancer risk stratification. This project demonstrates how bi-omics integration can pinpoint cancer-predicting biomarkers in Lynch Syndrome. Specifically, we investigated blood-based circulating microRNAs and metabolites that predict cancer occurrence within a 5.8-year prospective surveillance period.
 
 ## Study methods and analytical workflow  
 
